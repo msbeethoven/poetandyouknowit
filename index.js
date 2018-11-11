@@ -4,13 +4,9 @@ const fs = require('fs');
 //const writeStream = fs.createWriteStream('post.txt');
 var tumblr = require('tumblr.js');
 const axios = require('axios');
+var secrets = require('./secrets')
 
-var client = tumblr.createClient({
-  consumer_key: process.env.CONSUMER_KEY,
-  consumer_secret: process.env.CONSUMER_SECRET,
-  token: process.env.TOKEN,
-  token_secret: process.env.TOKEN_SECRET
-});
+var client = tumblr.createClient(secrets);
 
 let post = ''
 fs.readFile('post.txt', 'utf8', function (err, data) {
