@@ -1,25 +1,149 @@
 const request = require('request');
 const cheerio = require('cheerio');
 const fs = require('fs');
-const writeStream = fs.createWriteStream('post.txt');
-//const puppeteer = require('puppeteer');
-//const url = 'https://www.reddit.com/';
-//const urls = ['https://www.reddit.com/', 'https://www.reddit.com/r/Maniac/']
+//const writeStream = fs.createWriteStream('post.txt');
+var tumblr = require('tumblr.js');
+const axios = require('axios');
 
+var client = tumblr.createClient({
+  consumer_key: process.env.CONSUMER_KEY,
+  consumer_secret: process.env.CONSUMER_SECRET,
+  token: process.env.TOKEN,
+  token_secret: process.env.TOKEN_SECRET
+});
 
-
-request('https://www.reddit.com/','https://www.reddit.com/r/Maniac/', (error,
-response, html) => {
-  if (!error && response.statusCode == 200){
-    const $ = cheerio.load(html);
-
-    $('h2').each((index, element) => {
-      const titles = $(element).text()
-      console.log(titles)
-      writeStream.write(`${titles} \n`)
-    })
-  }
+let post = ''
+fs.readFile('post.txt', 'utf8', function (err, data) {
+  if (err) throw err;
+  console.log("this is data", typeof data)
+  post = data
+  console.log("this is the first post", post)
+  //return data
+  createPost(data)
 })
+
+const createPost = (body) => {
+  let line = body.split('\n').length
+  let randomLine = Math.floor(Math.random() * line - 1);
+  client.createTextPost(
+    'whatreddit',
+    {body: body.split('\n')[randomLine] },
+    function (err, data, resp) {
+      if (err){
+        console.error(err)
+      }
+      //console.log(resp.body)
+    }
+  )
+};
+
+//works -- every three seconds but the same post over and over, not random
+// const createPost = (body) => {
+//   let line = body.split('\n').length
+//   let randomLine = Math.floor(Math.random() * line - 1);
+//   setInterval(() => client.createTextPost(
+//     'whatreddit',
+//     {body: body.split('\n')[randomLine] },
+//     function (err, data, resp) {
+//       if (err){
+//         console.error(err)
+//       }
+//       //console.log(resp.body)
+//     }
+//   ), 3000)
+// };
+// setInterval(function(){
+//   console.log("testing")
+// }, 3000)
+
+console.log("this is post", post)
+
+
+
+
+//console.log("what is this", client.blogPosts)
+
+client.userInfo(function (err, data) {
+  if (err) {
+    console.error(err)
+  }
+  data.user.blogs.forEach(function (blog) {
+    //console.log("blog name?", blog.name); //whatreddit
+    //console.log("this is data", data)
+  });
+});
+
+// client.createTextPost(
+//   'whatreddit',
+//   {body: 'hello'},
+//   function(err, data, resp) {
+//     //console.log(resp.body)
+//   }
+// )
+
+// const postAPost = () => async text => {
+//   try {
+//     const res = await axios.post('api.tumblr.com/v2/blog/whatreddit/posts')
+//     console.log('what would res be', res)
+//   } catch (err){
+//     console.error(err)
+//   }
+// }
+
+
+//var blog = new tumblr.Blog('whatreddit.tumblr.com', client);
+
+// blog.text({limit: 2}, function(error, response) {
+//   if (error) {
+//     throw new Error(error);
+//   }
+
+//   console.log(response.posts);
+// });
+
+// var user = new tumblr.User(oauth);
+
+// user.info(function(error, response) {
+//   if (error) {
+//     throw new Error(error);
+//   }
+
+//   console.log(response.user);
+// });
+
+// request('https://www.reddit.com/', (error,
+// response, html) => {
+
+//   if (!error && response.statusCode == 200){
+//     const $ = cheerio.load(html);
+//     let titles = []
+//     $('h2').each((index, element) => {
+//       var title = $(element).text()
+//       writeStream.write(`${titles}`)
+//       titles.push(title)
+//     })
+//     console.log('titles', titles)
+//     return titles
+//   }
+// })
+
+// const interval = setInterval(() => {
+//   console.log('req', request())
+//   request.put('https://stackathon-36be9.firebaseio.com/test.json', {
+//  json: {
+//    //text: request().join(' ')
+//    text: titles.join(' ')
+//  }
+// }, (error, res, body) => {
+//  if (error) {
+//    console.error(error)
+//    return
+//  }
+//  console.log(`statusCode: ${res.statusCode}`)
+//  console.log(body)
+// })
+// }, 3000)
+// clearInterval(interval);
 // request(urls[1], (err, res, body) => {
 //   //Load HTML body into cheerio
 //   const $ = cheerio.load(body);

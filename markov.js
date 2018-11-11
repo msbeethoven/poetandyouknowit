@@ -1,17 +1,18 @@
 const fs = require('fs');
 
-let order = 5;
-let ngrams = {};
+var order = 5;
+var ngrams = {};
+
 
 try {
   var data = fs.readFileSync('./post.txt', 'utf8');
-  //console.log(data)
+  console.log("titles", data)
 } catch (err){
   console.log(err)
 }
 
-for (let i = 0; i <= data.length - order ; i++){
-  let gram = data.substring(i, i + order);
+for (var i = 0; i <= data.length - order ; i++){
+  var gram = data.substring(i, i + order);
 
   if (!ngrams[gram]){
     ngrams[gram] = [];
@@ -21,22 +22,22 @@ for (let i = 0; i <= data.length - order ; i++){
 
 //console.log(ngrams)
 
-
+//firebase --> function --> twitter api 
 function markov() {
 
-  let currentGram = data.substring(0, order); //start from 0, 3
-  let result = currentGram; //pick starting ngram and start that result 
+  var currentGram = data.substring(0, order); //start from 0, 3
+  var result = currentGram; //pick starting ngram and start that result 
 
 
-  for (let i = 0 ; i < 15; i++){
-    let possibilities = ngrams[currentGram]; //look up what are the possible next characeters based on the current gram
-    //console.log( "poss", possibilities)
+  for (let i = 0 ; i < 100; i++){
+    var possibilities = ngrams[currentGram]; //look up what are the possible next characeters based on the current gram
+    console.log( "poss", possibilities) //undefined
     if (!possibilities){ //protection for if random runs out of possibilites
       break;
     }
-    let next = possibilities[Math.floor(Math.random() * possibilities.length)];
+    var next = possibilities[Math.floor(Math.random() * possibilities)];
     result += next;
-    let len = result.length;
+    var len = result.length;
     currentGram = result.substring(len - order, len) //next gram is last 3 chars of the text 
     console.log(result)
   }
